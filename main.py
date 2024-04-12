@@ -1,9 +1,10 @@
-
 import os
 from contextlib import asynccontextmanager
-from fastapi import FastAPI, Request, HTTPException
+from fastapi import FastAPI, Request, HTTPException, Security
 from fastapi.responses import Response
+from fastapi.security.api_key import APIKeyHeader, APIKey
 from starlette.exceptions import HTTPException as StarletteHTTPException
+from starlette.status import HTTP_403_FORBIDDEN
 import argparse
 import fire
 import uvicorn
@@ -16,6 +17,20 @@ parser = argparse.ArgumentParser()
 parser.add_argument("--host", default="0.0.0.0", help="host")
 parser.add_argument("--port", default=8000, help="port")
 args = parser.parse_args()
+
+API_KEY_NAME = "X-API-KEY"
+API_KEY = "dinglizuibangl, hahahahah"  # Replace with your actual API key
+api_key_header = APIKeyHeader(name=API_KEY_NAME, auto_error=False)
+
+async def get_api_key(
+    api_key: str = Security(api_key_header),
+):
+    if api_key == API_KEY:
+        return api_key
+    else:
+        raise HTTPException(
+            status_code=HTTP_403_FORBIDDEN, detail="Could not validate API key"
+        )
 
 
 app = FastAPI()
@@ -30,7 +45,10 @@ async def http_exception_handler(request: Request, exc: StarletteHTTPException):
 
 
 @app.post("/run_rust_code", response_model=BaseResponse)
-async def run_rust_code(request: BaseRequest):
+async def run_rust_code(
+    request: BaseRequest,
+    api_key: APIKey = Security(get_api_key),
+):
     logger.info(f"Received rust code: {request.rust_code}")
     output, compile_error = create_and_run_rust_project(request.rust_code)
     if compile_error:
