@@ -1,0 +1,4 @@
+fastapi
+fire
+uvicorn
+loguru

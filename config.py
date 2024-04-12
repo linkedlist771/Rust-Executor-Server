@@ -1,0 +1,1 @@
+RUST_PROJECTS_SAVE_PATH = 'rust_projects'
