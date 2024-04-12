@@ -2,13 +2,14 @@ import subprocess
 import time
 import tempfile
 import os
-from config import RUST_PROJECTS_SAVE_PATH
+from config import RUST_PROJECTS_SAVE_PATH, ROOT_DIR
 
 
 if not os.path.exists(RUST_PROJECTS_SAVE_PATH):
     os.makedirs(RUST_PROJECTS_SAVE_PATH)
 
 def create_and_run_rust_project(code: str) -> tuple[str, bool]:
+    os.chdir(ROOT_DIR)
     # 创建临时文件
     with tempfile.NamedTemporaryFile(delete=False, suffix='.rs') as temp_file:
         # 将 Rust 代码写入临时文件
