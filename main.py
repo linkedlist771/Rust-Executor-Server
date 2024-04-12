@@ -49,8 +49,10 @@ async def run_rust_code(
     request: BaseRequest,
     api_key: APIKey = Security(get_api_key),
 ):
-    logger.info(f"Received rust code: {request.rust_code}")
+    logger.info(f"Received rust code: \n{request.rust_code}")
     output, compile_error = create_and_run_rust_project(request.rust_code)
+    logger.info(f"Output: \n{output}")
+
     if compile_error:
         return BaseResponse(message="Rust code failed to compile, check data for details.", data=output, code=400)
     else:
